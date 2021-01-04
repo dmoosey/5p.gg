@@ -20,10 +20,10 @@ Due to the lack of an [OP.GG](op.gg) API, this bot uses the `request-promise` li
 ```>pool``` Tells the user which champs are currently in their pool.
 
 
-```counter <matchup> <lane>``` Will display champion pool winrates versus given matchup in specified lane.
+```>counter <matchup> <lane>``` Will display champion pool winrates versus given matchup in specified lane.
 
 
-```op <lane>``` Finds and logs all op.gg tier 1 champions for the supplied lane.
+```>op <lane>``` Finds and logs all op.gg tier 1 champions for the supplied lane.
 
 
 ## Improvment
