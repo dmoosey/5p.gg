@@ -1,0 +1,26 @@
+{
+  "name": "5p.gg-discord",
+  "version": "0.0.1",
+  "description": "Discord Bot for 5p.gg counter pick assistant",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "LoL",
+    "discord",
+    "ranked"
+  ],
+  "author": "Dan Moore",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/opus": "^0.3.3",
+    "cheerio": "^1.0.0-rc.5",
+    "discord.js": "^12.5.1",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6"
+  },
+  "devDependencies": {
+    "eslint": "^7.16.0"
+  }
+}
