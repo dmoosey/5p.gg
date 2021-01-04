@@ -26,7 +26,7 @@ Due to the lack of an [OP.GG](op.gg) API, this bot uses the `request-promise` li
 ```>op <lane>``` Finds and logs all op.gg tier 1 champions for the supplied lane.
 
 ### Example Usage
-![Basic use of 5p.gg](https://gyazo.com/9416b00c39b602687336471d18e87de6)
+![Basic use of 5p.gg](https://i.gyazo.com/9416b00c39b602687336471d18e87de6.png)
 
 
 ## Improvment
