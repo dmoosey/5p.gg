@@ -164,6 +164,7 @@ const counter = async (msg, user) => {
 
 const op = async (lane) => {
     const data = await webScraper.getOP(lane);
+    return data.join(', ');
 }
 
 module.exports = { addChamp, displayPool, deleteChamp, counter, op };

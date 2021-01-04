@@ -53,6 +53,7 @@ const validate = async (champ) => {
   
 }
 
+// Returns an array of op.gg tier 1 champion names
 const getOP = async (role) => {
     const url = 'https://euw.op.gg/champion/statistics';
     const html = await rp(url);
@@ -63,10 +64,17 @@ const getOP = async (role) => {
     const tierOne = `"//opgg-static.akamaized.net/images/site/champion/icon-champtier-1.png"`;
     const tableValue = ".champion-index-table__cell--value";
 
-    const query = ".champion-trend-tier-" + role.toUpperCase() + "> tr:has(td:has(img[src$="+ tierOne +"])) > .champion-index-table__cell--value";
+    const query = ".champion-trend-tier-" + role.toUpperCase() + "> tr:has(td:has(img[src$=" + tierOne + "])) > .champion-index-table__cell--champion > a > .champion-index-table__name";
 
     const DATA = $(query, html);
-    console.log(DATA['0']);
+
+    for(let i = 0; i < DATA.length; i++){
+        const champ = DATA[i];
+        op.push(champ.children[0].data);
+    }
+
+
+    return op;
 }
 
 module.exports = {scrape, validate, getOP};
