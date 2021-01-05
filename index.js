@@ -29,7 +29,7 @@ client.on('message', async (msg) => {
     }
 
     if (msg.content === `${prefix}pool`) {
-        msg.channel.send(commands["pool"].process(msg, msg.author));
+        msg.reply(commands["pool"].process(msg, msg.author));
     }
 
     if (msg.content.split(' ')[0] === `${prefix}counter`) {

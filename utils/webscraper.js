@@ -20,7 +20,7 @@ const scrape = async (pool, matchup, lane) => {
         const DATA_ELEMENT = $(query, html);
         // check we have some data on the matchup
         if (!Object.keys(DATA_ELEMENT).includes('0')) {
-            pool[champ][matchup] = { winrate: null, sample: null };
+            continue
         } else {
             // parse out internal data object
             const DATA_OBJ = DATA_ELEMENT['0'].attribs;

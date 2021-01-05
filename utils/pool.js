@@ -1,10 +1,15 @@
 const fs = require('fs'),
     webScraper = require('./webscraper'),
-    command = require('./commands'),
-    DATABASE = JSON.parse(fs.readFileSync('./data/DATABASE.json'));
+    command = require('./commands');
+
+let DATABASE = JSON.parse(fs.readFileSync('./data/DATABASE.json')),
     USER_OBJ = DATABASE["users"];
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+const readDB = () => {
+    DATABASE = JSON.parse(fs.readFileSync('./data/DATABASE.json'));
+    USER_OBJ = DATABASE["users"];
+}
 
 // Adds provided champion to the users pool object
 const addChamp = async (msg, user) => {
@@ -68,7 +73,7 @@ const deleteChamp = async (msg, user) => {
         // Log a message
         return `${input.champ.formatted} removed from your champion pool!`;
         // Catch and log errors
-    } catch { err } {
+    } catch (err) {
         console.log(err);
         return err.message
     }
@@ -78,40 +83,47 @@ const deleteChamp = async (msg, user) => {
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 // Returns a formatted string containing all the users champion pool
 const displayPool = (msg, user) => {
-    // Read users pool and store keys (champs)
-    const champs = Object.keys(USER_OBJ[user.id]["pool"]);
+    try {
+        readDB();
+        // Read users pool and store keys (champs)
+        const champs = Object.keys(USER_OBJ[user.id]["pool"]);
+
+        // If the user doesn't have a champ pool let them know
+        if (champs.length <= 0) return "You haven't added any champs to your pool yet use **' >add <champ name> '** to get started."
+
+        // Convert the champ names to sentence case
+        champs.forEach((champ, index, champs) => {
+
+            const format = '**' + champ.slice(0, 1).toUpperCase() + champ.slice(1).toLowerCase() + '**';
+            champs[index] = format;
+        });
 
 
-    // If the user doesn't have a champ pool let them know
-    if (champs.length <= 0) return "You haven't added any champs to your pool yet use **' >add <champ name> '** to get started."
+        // Format the array into a string with proper punctuation
+        champs.forEach((champ, index, champs) => {
 
-    // Convert the champ names to sentence case
-    champs.forEach((champ, index, champs) => {
+            if (index + 1 === champs.length) {
+                champs[index] = champs[index].concat('.');
+            }
 
-        const format = '**' + champ.slice(0, 1).toUpperCase() + champ.slice(1).toLowerCase() + '**';
-        champs[index] = format;
-    });
+            if (!(index + 1 === champs.length)) {
+                champs[index] = champs[index].concat(',');
+            }
 
+        })
 
-    // Format the array into a string with proper punctuation
-    champs.forEach((champ, index, champs) => {
-
-        if (index + 1 === champs.length) {
-            champs[index] = champs[index].concat('.');
+        if (champs.length > 2) {
+            champs.splice(champs.length - 1, 0, 'and');
         }
 
-        if (!(index + 1 === champs.length)) {
-            champs[index] = champs[index].concat(',');
-        }
-
-    })
-
-    if (champs.length > 2) {
-        champs.splice(champs.length - 1, 0, 'and');
+        return `Currently in your pool: ${champs.join(' ')}`;
+    } catch (err) {
+        console.log(err);
+        return err.message
     }
 
-    return `Currently in your pool: ${champs.join(' ')}`;
 }
+
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 // Returns a string containing matchup data for the users champion pool vs given champ
 const counter = async (msg, user) => {
@@ -124,8 +136,8 @@ const counter = async (msg, user) => {
 
         const valid = await webScraper.validate(matchup);
 
-        if(!valid) throw new Error(`Please provide a valid champion name.`)
-        if(!roles.includes(lane)) throw new Error(`Please provide a valid role, one of; top, jungle, mid, bot or support.`)
+        if (!valid) throw new Error(`Please provide a valid champion name.`)
+        if (!roles.includes(lane)) throw new Error(`Please provide a valid role, one of; top, jungle, mid, bot or support.`)
 
         const stats = await webScraper.scrape(USER_OBJ[user.id]["pool"], matchup, lane);
 
@@ -145,7 +157,7 @@ const counter = async (msg, user) => {
 
             const wr = stats[champ][matchup].winrate;
             const sample = stats[champ][matchup].sample;
-   
+
             champ = champ.replace(/\b\w/g, l => l.toUpperCase());
 
             statsArr.push(`**${champ}** | ${wr}% *(${sample} games)*`);
@@ -153,8 +165,8 @@ const counter = async (msg, user) => {
 
         const paragraph = statsArr.join('\n');
 
-        return `vs **${input.champ.formatted} ${input.lane.formatted}**\n` + paragraph;
-        
+        return `vs ${input.champ.formatted} ${input.lane.formatted}\n` + paragraph;
+
     } catch (err) {
         console.log(err);
         return err.message
@@ -165,28 +177,28 @@ const counter = async (msg, user) => {
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 // Returns a formatted string containing op.gg tier one champs for the given role
 const op = async (msg) => {
-    try{    
+    try {
         const input = command.parseCommand(msg);
         const lane = input.lane.raw;
-    
+
         const data = await webScraper.getOP(lane);
         console.log(data);
-    
+
         const names = Object.keys(data);
 
-        if(!names[0]) return `Please provide a valid role, one of: **top**, **jungle**, **mid**, **adc** or **support**.`
+        if (!names[0]) return `Please provide a valid role, one of: **top**, **jungle**, **mid**, **adc** or **support**.`
         let formatted = [`**OP** > **${input.lane.formatted}** `];
-    
+
         names.forEach(champ => {
             const wr = data[champ].wr;
             const wrFloat = parseFloat(wr);
             const sample = data[champ].sample;
             const medal = wrFloat > 52.6 ? ':first_place:' : wrFloat > 51.5 ? ':second_place:' : ':third_place:';
             const str = medal + ` **${champ}** | ${wr} (*${sample} games*)`
-    
+
             formatted.push(str);
         })
-    
+
         return formatted.join('\n')
     } catch (err) {
         console.log(err);
