@@ -1,6 +1,5 @@
 const fs = require('fs'),
-    webScraper = require('./webscraper'),
-    command = require('./commands');
+    webScraper = require('./webscraper');
 
 let DATABASE = JSON.parse(fs.readFileSync('./data/DATABASE.json')),
     USER_OBJ = DATABASE["users"];
@@ -11,22 +10,21 @@ const readDB = () => {
     USER_OBJ = DATABASE["users"];
 }
 
+
 // Adds provided champion to the users pool object
-const addChamp = async (msg, user) => {
+const addChamp = async (input) => {
     // Enclosed in try-catch block for error handling
     try {
+        readDB();
         // Initialize variables for pool info
-        const userPool = USER_OBJ[user.id]["pool"];
+        const userPool = USER_OBJ[input.user.id]["pool"];
         const champs = Object.keys(userPool);
-
-        // Get input object from parseCommand helper
-        const input = command.parseCommand(msg);
 
         // Check if the champ has already been added to the users pool
         if (champs.includes(input.champ.raw)) throw new Error(`${input.champ.formatted} is already in your champion pool.`);
 
         // Check if the given name is a valid champion
-        const valid = await webScraper.validate(input.champ.raw);
+        const valid = await webScraper.validate(input);
 
         // Throw an error for invalid inputs
         if (!valid) throw new Error(`Please provide a valid champion name.`)
@@ -35,7 +33,7 @@ const addChamp = async (msg, user) => {
         userPool[input.champ.raw] = {};
 
         // Update and write to DATABASE
-        DATABASE["users"][user.id]["pool"] = userPool;
+        DATABASE["users"][input.user.id]["pool"] = userPool;
 
         fs.writeFileSync('./data/DATABASE.json', JSON.stringify(DATABASE));
 
@@ -51,23 +49,21 @@ const addChamp = async (msg, user) => {
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 // Removes provided champion from the users pool
-const deleteChamp = async (msg, user) => {
+const deleteChamp = async (input) => {
     // Enclosed in try-catch block for error handling
     try {
         // Initialize variables for pool info
-        const userPool = USER_OBJ[user.id]["pool"];
+        const userPool = USER_OBJ[input.user.id]["pool"];
         const champs = Object.keys(userPool);
 
-        // Get input object from parseCommand helper
-        const input = command.parseCommand(msg);
         // Validate champion input
-        const valid = await webScraper.validate(input.champ.raw);
+        const valid = await webScraper.validate(input);
         // Throw error for invalid inputs
         if (!valid) throw new Error(`Please provide a valid champion name.`)
         // If the champ isn't in the pool tell the user
         if (!champs.includes(input.champ.raw)) return `${input.champ.formatted} is not in your champion pool.`;
         // Once validated and found remove from DATABASE
-        delete DATABASE["users"][user.id]["pool"][input.champ.raw];
+        delete DATABASE["users"][input.user.id]["pool"][input.champ.raw];
         // Write updated data
         fs.writeFileSync('./data/DATABASE.json', JSON.stringify(DATABASE));
         // Log a message
@@ -82,20 +78,26 @@ const deleteChamp = async (msg, user) => {
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 // Returns a formatted string containing all the users champion pool
-const displayPool = (msg, user) => {
+const displayPool = (input) => {
     try {
         readDB();
         // Read users pool and store keys (champs)
-        const champs = Object.keys(USER_OBJ[user.id]["pool"]);
+        const champs = Object.keys(USER_OBJ[input.user.id]["pool"]);
 
         // If the user doesn't have a champ pool let them know
         if (champs.length <= 0) return "You haven't added any champs to your pool yet use **' >add <champ name> '** to get started."
 
         // Convert the champ names to sentence case
-        champs.forEach((champ, index, champs) => {
+        function format(str){
+            str = str.replace(/\b[a-z]/g, (letter) => letter.toUpperCase() );
+            str = str.replace(/'(S) /g, (letter) => letter.toLowerCase() );
+            return `**${str}**`;
+        }
 
-            const format = '**' + champ.slice(0, 1).toUpperCase() + champ.slice(1).toLowerCase() + '**';
-            champs[index] = format;
+        champs.forEach((champ, index, champs) => {
+            const formatted = format(champ);
+            console.log(`champ: ${champ}, formatted: ${formatted}`);
+            champs[index] = formatted;
         });
 
 
@@ -126,22 +128,21 @@ const displayPool = (msg, user) => {
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 // Returns a string containing matchup data for the users champion pool vs given champ
-const counter = async (msg, user) => {
+const counter = async (input) => {
     try {
         const roles = ['top', 'jungle', 'mid', 'bot', 'support'];
-        const input = command.parseCommand(msg);
 
         const matchup = input.champ.raw;
         const lane = input.lane.raw;
 
-        const valid = await webScraper.validate(matchup);
+        const valid = await webScraper.validate(input);
 
         if (!valid) throw new Error(`Please provide a valid champion name.`)
         if (!roles.includes(lane)) throw new Error(`Please provide a valid role, one of; top, jungle, mid, bot or support.`)
 
-        const stats = await webScraper.scrape(USER_OBJ[user.id]["pool"], matchup, lane);
+        const stats = await webScraper.scrape(USER_OBJ[input.user.id]["pool"], input);
 
-        DATABASE["users"][user.id]["pool"] = stats;
+        DATABASE["users"][input.user.id]["pool"] = stats;
 
         fs.writeFileSync('./data/DATABASE.json', JSON.stringify(DATABASE));
 
@@ -176,13 +177,11 @@ const counter = async (msg, user) => {
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 // Returns a formatted string containing op.gg tier one champs for the given role
-const op = async (msg) => {
+const op = async (input) => {
     try {
-        const input = command.parseCommand(msg);
         const lane = input.lane.raw;
 
         const data = await webScraper.getOP(lane);
-        console.log(data);
 
         const names = Object.keys(data);
 

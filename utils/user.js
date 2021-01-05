@@ -1,8 +1,9 @@
 const fs = require('fs');
 
-const addUser = async (msg, user) => {
+const addUser = async (input) => {
     try {
         const DATABASE = JSON.parse(fs.readFileSync('./data/DATABASE.json', 'utf8'));
+        const userId = input.user.id;
         // Convert DATABASE data to an object
         const usersExist = Object.keys(DATABASE).includes("users");
 
@@ -11,12 +12,12 @@ const addUser = async (msg, user) => {
         const users = Object.keys(DATABASE.users);
 
         // If the user already has a profile return
-        if (users.some(e => e == user.id)) return `${user} You already have a 5p.gg profile.`
+        if (users.some(e => e == userId)) return `${user} You already have a 5p.gg profile.`
 
         // Add new data, checking if user already has a profile
-        if (!users.includes(user.id)) {
-            DATABASE["users"][user.id] = {
-                aliases: [user.username],
+        if (!users.includes(userId)) {
+            DATABASE["users"][userId] = {
+                aliases: [input.user.username],
                 permissions: {},
                 pool: {}
             }
@@ -30,7 +31,7 @@ const addUser = async (msg, user) => {
         // Write updated obj
         fs.writeFileSync('./data/DATABASE.json', updated, 'utf8');
 
-        return `Profile initalized for user ${user.username} (${user}).`
+        return `Profile initalized for user (${input.user.username}).`
 
     } catch (err) {
         console.log(err)

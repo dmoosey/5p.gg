@@ -3,7 +3,9 @@ const $ = require('cheerio');
 const fs = require('fs');
 
 // Write data to users pool and return an object containing matchup data for opponents choice vs your champ pool
-const scrape = async (pool, matchup, lane) => {
+const scrape = async (pool, input) => {
+    const matchup = input.champ.raw;
+    const lane = input.lane.raw;
     // initalize op.gg url pointing to opponent champ data
     const url = 'https://euw.op.gg/champion/' + matchup + '/statistics/' + lane + '/matchup';
 
@@ -14,8 +16,10 @@ const scrape = async (pool, matchup, lane) => {
     for (const champ of Object.keys(pool)) {
         // if the matchup is the same as current champ skip scraping we know it will be null
         if (champ.toLowerCase() === matchup.toLowerCase()) continue
+        const champKey = champ.replace(/[^\w\s]|_/g, "")
+        .replace(/\s+/g, " ");
         // store query to identify data element
-        const query = `[data-champion-name=${champ}]`;
+        const query = `[data-champion-key=${champKey}]`;
         // select data element
         const DATA_ELEMENT = $(query, html);
         // check we have some data on the matchup
@@ -34,18 +38,17 @@ const scrape = async (pool, matchup, lane) => {
     return pool;
 }
 
-const validate = async (champ) => {
-  // Capitalize champ string
-  champ = champ.charAt(0).toUpperCase() + champ.slice(1);
+const validate = async (input) => {
   // initialize uri to scrape
-  const url = 'https://euw.op.gg/champion/' + champ
+  const url = 'https://euw.op.gg/champion/' + input.champ.clean;
   // wait for rp to resolve html
   const html = await rp(url);
   // store search params to see if we landed on a champ page
   const query = ".champion-stats-header-info__name";
   // store contents of champ header and boolean representation as to wether we are on the right page
   const HEADER_ELEMENT = $(query, html);
-  const found = Object.keys(HEADER_ELEMENT).includes('0');
+  //console.log(`champ: ${champ} element: ${HEADER_ELEMENT[0].children[0].data}`);
+  const found = HEADER_ELEMENT[0].children[0].data == input.champ.sentence;
 
   if(!found) return false
 
@@ -55,7 +58,6 @@ const validate = async (champ) => {
 
 // Returns an array of op.gg tier 1 champion names
 const getOP = async (lane) => {
-    console.log('entered webscraper');
     const url = 'https://euw.op.gg/champion/statistics';
     const html = await rp(url);
     const op = {};
@@ -75,7 +77,6 @@ const getOP = async (lane) => {
             wr: CHAMP_STATS[i*2].children[0].data,
             sample: CHAMP_STATS[i*2+1].children[0].data, 
         }
-        console.log(op);
     }
 
     return op;

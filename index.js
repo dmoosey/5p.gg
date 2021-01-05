@@ -1,6 +1,6 @@
 /* MODULES */
 const discord = require("discord.js"),
-      fivep = require("./5p.js"),
+      commands = require("./utils/commands"),
       config = require("./data/config.json"),
       prefix = config.prefix,
       fs = require('fs');
@@ -16,62 +16,52 @@ client.on('ready', () => {
 /* MAIN COMMAND HANDLING */
 
 client.on('message', async (msg) => {
-    if (msg.content === `${prefix}start`) {
-        msg.channel.send(await commands["start"].process(msg, msg.author));
-    }
+    try{
+        const parsed = parseCommand(msg);
+        msg.reply(await commands[parsed.command].process(parsed))
 
-    if (msg.content.split(' ')[0] === `${prefix}add`) {
-        msg.reply(await commands["add <champ name>"].process(msg, msg.author));
+    } catch (err) {
+        console.log(err);
     }
-
-    if (msg.content.split(' ')[0] === `${prefix}delete`) {
-        msg.reply(await commands["delete <champ name>"].process(msg, msg.author));
-    }
-
-    if (msg.content === `${prefix}pool`) {
-        msg.reply(commands["pool"].process(msg, msg.author));
-    }
-
-    if (msg.content.split(' ')[0] === `${prefix}counter`) {
-        msg.reply(await commands["counter <champ name> <lane>"].process(msg, msg.author));
-    }
-
-    if (msg.content.split(' ')[0] === `${prefix}op`) {
-        msg.reply(await commands["op <lane>"].process(msg));
-    }
+    
+    
 })
 
 client.login(process.env.GGTOKEN);
 
-/* COMMANDS */
-const commands = {
-    "start": {
-        description: "Initalizes a 5p.gg object for the user",
-        process: fivep.user.addUser
-    },
 
-    "add <champ name>": {
-        description: "Adds a new champion to the users pool",
-        process: fivep.pool.addChamp
-    },
+/* COMMAND PARSING */
+function parseCommand(msg){
+    const input = {
+        user: msg.author,
+        raw: msg.content
+    };
 
-    "delete <champ name>": {
-        description: "Removes a champion from the users pool",
-        process: fivep.pool.deleteChamp
-    },
+    input.arr = input.raw.split(' ');
+    input.command = input.arr[0].replace(prefix, "");
 
-    "pool": {
-        description: "List all champions saved in users pool",
-        process: fivep.pool.displayPool
-    },
 
-    "counter <champ name> <lane>": {
-        description: "Return the winrates for the users pool versus given champ ",
-        process: fivep.pool.counter
-    },
-    
-    "op <lane>": {
-        description: "Logs the 3 strongest champions for given role",
-        process: fivep.pool.op
+    const isValidCommand = Object.keys(commands).includes(input.command);
+    if(!isValidCommand) throw new Error(`Invalid Command.`)
+
+    input.championless = commands[input.command].championless;
+
+    if(input.arr.length > 1 && !input.championless){
+        input.champ = {};
+        input.champ.raw = input.arr[1].toLowerCase();
+        input.champ.sentence = input.champ.raw.replace(/\b\w/g, l => l.toUpperCase());
+        input.champ.clean = input.champ.raw.replace(/[^\w\s]|_/g, "")
+        .replace(/\s+/g, " ");
+        input.champ.formatted = '**' + input.champ.sentence + '**';
     }
+
+    if(input.arr.length > 2 || (input.championless && input.arr.length > 1)){
+        input.lane = {};
+        input.lane.raw = input.championless ? input.arr[1].toLowerCase() : input.arr[2].toLowerCase();
+        input.lane.formatted = '**' + input.lane.raw.replace(/\b\w/g, l => l.toUpperCase()) + '**';
+    }
+
+    console.log(input);
+
+    return input
 }
