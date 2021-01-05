@@ -27,7 +27,7 @@ Due to the lack of an [OP.GG](op.gg) API, this bot uses the `request-promise` li
 
 ### Example Usage
 #### Basic use of pool functionality
-![Basic use of 5p.gg](https://i.gyazo.com/9416b00c39b602687336471d18e87de6.png)
+![Basic use of 5p.gg](https://i.gyazo.com/2544ba1f83e66e656df102826d9b2444.png)
 
 
 #### >op <role> command
