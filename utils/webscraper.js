@@ -16,8 +16,9 @@ const scrape = async (pool, input) => {
     for (const champ of Object.keys(pool)) {
         // if the matchup is the same as current champ skip scraping we know it will be null
         if (champ.toLowerCase() === matchup.toLowerCase()) continue
+        //hard coded edge case 
         const champKey = champ.replace(/[^\w\s]|_/g, "")
-        .replace(/\s+/g, " ");
+        .replace(/\s+/g, "");
         // store query to identify data element
         const query = `[data-champion-key=${champKey}]`;
         // select data element
@@ -39,16 +40,20 @@ const scrape = async (pool, input) => {
 }
 
 const validate = async (input) => {
+  // set champ path to land on correct page
+  let champPath = input.champ.squished ? input.champ.squished : input.champ.clean;
+  champPath = champPath.replace(/[^\w\s]|_/g, "")
+  .replace(/\s+/g, "");
   // initialize uri to scrape
-  const url = 'https://euw.op.gg/champion/' + input.champ.clean;
+  const url = 'https://euw.op.gg/champion/' + champPath;
   // wait for rp to resolve html
   const html = await rp(url);
   // store search params to see if we landed on a champ page
   const query = ".champion-stats-header-info__name";
   // store contents of champ header and boolean representation as to wether we are on the right page
   const HEADER_ELEMENT = $(query, html);
-  //console.log(`champ: ${champ} element: ${HEADER_ELEMENT[0].children[0].data}`);
-  const found = HEADER_ELEMENT[0].children[0].data == input.champ.sentence;
+
+  const found = Object.keys(HEADER_ELEMENT).includes("0");
 
   if(!found) return false
 

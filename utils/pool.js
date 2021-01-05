@@ -95,8 +95,9 @@ const displayPool = (input) => {
         }
 
         champs.forEach((champ, index, champs) => {
-            const formatted = format(champ);
-            console.log(`champ: ${champ}, formatted: ${formatted}`);
+            let formatted = format(champ);
+            // hard coded edge case
+            if(champ == 'jarvan iv') formatted = `**Jarvan IV**`;
             champs[index] = formatted;
         });
 
@@ -160,6 +161,9 @@ const counter = async (input) => {
             const sample = stats[champ][matchup].sample;
 
             champ = champ.replace(/\b\w/g, l => l.toUpperCase());
+
+            //hard coded edge case
+            if(champ == 'Jarvan Iv') champ = `Jarvan IV`;
 
             statsArr.push(`**${champ}** | ${wr}% *(${sample} games)*`);
         }
