@@ -54,25 +54,29 @@ const validate = async (champ) => {
 }
 
 // Returns an array of op.gg tier 1 champion names
-const getOP = async (role) => {
+const getOP = async (lane) => {
+    console.log('entered webscraper');
     const url = 'https://euw.op.gg/champion/statistics';
     const html = await rp(url);
-    const op = [];
+    const op = {};
 
-    const trendTable = "champion-index-table";
-    const tab = "champion-trend-tier-" + role.toUpperCase();
     const tierOne = `"//opgg-static.akamaized.net/images/site/champion/icon-champtier-1.png"`;
-    const tableValue = ".champion-index-table__cell--value";
 
-    const query = ".champion-trend-tier-" + role.toUpperCase() + "> tr:has(td:has(img[src$=" + tierOne + "])) > .champion-index-table__cell--champion > a > .champion-index-table__name";
+    const statQuery = ".champion-trend-tier-" + lane.toUpperCase() + "> tr:has(td:has(img[src$=" + tierOne + "])) > .champion-index-table__cell--value:contains('%')";
+    const nameQuery = ".champion-trend-tier-" + lane.toUpperCase() + "> tr:has(td:has(img[src$=" + tierOne + "])) > .champion-index-table__cell--champion > a > .champion-index-table__name";
 
-    const DATA = $(query, html);
+    const CHAMP_NAMES = $(nameQuery, html);
+    const CHAMP_STATS = $(statQuery, html);
 
-    for(let i = 0; i < DATA.length; i++){
-        const champ = DATA[i];
-        op.push(champ.children[0].data);
+
+    for(let i = 0; i < CHAMP_NAMES.length; i++){
+        const champName = CHAMP_NAMES[i].children[0].data;
+        op[champName] = {
+            wr: CHAMP_STATS[i*2].children[0].data,
+            sample: CHAMP_STATS[i*2+1].children[0].data, 
+        }
+        console.log(op);
     }
-
 
     return op;
 }

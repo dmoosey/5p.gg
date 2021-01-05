@@ -88,7 +88,7 @@ const displayPool = (msg, user) => {
     // Convert the champ names to sentence case
     champs.forEach((champ, index, champs) => {
 
-        const format = champ.slice(0, 1).toUpperCase() + champ.slice(1).toLowerCase();
+        const format = '**' + champ.slice(0, 1).toUpperCase() + champ.slice(1).toLowerCase() + '**';
         champs[index] = format;
     });
 
@@ -162,9 +162,37 @@ const counter = async (msg, user) => {
 
 }
 
-const op = async (lane) => {
-    const data = await webScraper.getOP(lane);
-    return data.join(', ');
+/*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+// Returns a formatted string containing op.gg tier one champs for the given role
+const op = async (msg) => {
+    try{    
+        const input = command.parseCommand(msg);
+        const lane = input.lane.raw;
+    
+        const data = await webScraper.getOP(lane);
+        console.log(data);
+    
+        const names = Object.keys(data);
+
+        if(!names[0]) return `Please provide a valid role, one of: **top**, **jungle**, **mid**, **adc** or **support**.`
+        let formatted = [`**OP** > **${input.lane.formatted}** `];
+    
+        names.forEach(champ => {
+            const wr = data[champ].wr;
+            const wrFloat = parseFloat(wr);
+            const sample = data[champ].sample;
+            const medal = wrFloat > 52.6 ? ':first_place:' : wrFloat > 51.5 ? ':second_place:' : ':third_place:';
+            const str = medal + ` **${champ}** | ${wr} (*${sample} games*)`
+    
+            formatted.push(str);
+        })
+    
+        return formatted.join('\n')
+    } catch (err) {
+        console.log(err);
+        return err.message
+    }
+
 }
 
 module.exports = { addChamp, displayPool, deleteChamp, counter, op };

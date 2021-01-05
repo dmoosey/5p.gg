@@ -37,7 +37,7 @@ client.on('message', async (msg) => {
     }
 
     if (msg.content.split(' ')[0] === `${prefix}op`) {
-        msg.reply(await commands["op <lane>"].process(msg.content.split(' ')[1]));
+        msg.reply(await commands["op <lane>"].process(msg));
     }
 })
 
