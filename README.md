@@ -17,7 +17,7 @@ Due to the lack of an [OP.GG](op.gg) API, this bot uses the `request-promise` li
 ```>delete <champ>``` Removes the provided champion from the users pool.
 
 
-```>pool``` Tells the user which champs are currently in their pool.
+```>pool``` Shows the user their current champ pool.
 
 
 ```>counter <matchup> <lane>``` Will display champion pool winrates versus given matchup in specified lane.
@@ -42,3 +42,4 @@ This project is essentially a proof of concept for the moment. My goals with it 
 * Matchup specific rune recommendations
 * Matchup specific CS Goal
 * Ban recommendations based on champ pool
+* Role sub-pools
