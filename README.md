@@ -31,7 +31,7 @@ Due to the lack of an [OP.GG](op.gg) API, this bot uses the `request-promise` li
 
 
 #### >op <role> command
-![op command results](https://i.gyazo.com/5d543ce693f6469b44a5d794d3d48aa7.png)
+![op command results](https://i.gyazo.com/188f6827f8331eab4e2d233ea0c3d849.png)
 
 
 ## Improvment
