@@ -1,16 +1,6 @@
 const user = require('./user'),
-      pool = require('./pool'),
-      prefix = require('../data/config.json').prefix;
-
-      const commands = () => {
-        const commandsArr = Object.keys(module.exports).map(command => {
-        const formatted = `**${module.exports[command].usage}**`
-        return formatted
-        });
-    
-        return commandsArr.join('\n')
-    
-    }
+    pool = require('./pool'),
+    prefix = require('../data/config.json').prefix;
 
 module.exports = {
     "start": {
@@ -52,7 +42,7 @@ module.exports = {
         args: 2,
         process: pool.counter
     },
-    
+
     "op": {
         description: "Lists and ranks all op.gg tier 1 champions for <lane>",
         usage: `${prefix}op <lane>`,
@@ -68,15 +58,15 @@ module.exports = {
         args: 0,
         process: (input) => {
             const commandsArr = Object.keys(module.exports).map(command => {
-            const COMMAND_OBJ = module.exports[command]
-            const formatted = `**${COMMAND_OBJ.usage}** - ${COMMAND_OBJ.description}`
-            return formatted
+                const COMMAND_OBJ = module.exports[command]
+                const formatted = `**${COMMAND_OBJ.usage}** - ${COMMAND_OBJ.description}`
+                return formatted
             });
-            
+
             commandsArr.unshift('**5P.GG Command List**');
 
             return commandsArr.join('\n')
-        
+
         }
     }
 };
