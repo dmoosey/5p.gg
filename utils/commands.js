@@ -2,9 +2,19 @@ const user = require('./user'),
       pool = require('./pool'),
       prefix = require('../data/config.json').prefix;
 
+      const commands = () => {
+        const commandsArr = Object.keys(module.exports).map(command => {
+        const formatted = `**${module.exports[command].usage}**`
+        return formatted
+        });
+    
+        return commandsArr.join('\n')
+    
+    }
+
 module.exports = {
     "start": {
-        description: "Initalizes a 5p.gg object for the user",
+        description: "Initalizes a 5p.gg profile for the user",
         usage: `${prefix}start`,
         championless: true,
         args: 0,
@@ -12,7 +22,7 @@ module.exports = {
     },
 
     "add": {
-        description: "Adds a new champion to the users pool",
+        description: "Adds <champ name> to the users pool",
         usage: `${prefix}add <champ name>`,
         championless: false,
         args: 1,
@@ -20,7 +30,7 @@ module.exports = {
     },
 
     "delete": {
-        description: "Removes a champion from the users pool",
+        description: "Removes <champ name> from the users pool",
         usage: `${prefix}delete <champ name>`,
         championless: false,
         args: 1,
@@ -28,7 +38,7 @@ module.exports = {
     },
 
     "pool": {
-        description: "List all champions saved in users pool",
+        description: "List all champions currently in the users pool",
         usage: `${prefix}pool`,
         championless: true,
         args: 0,
@@ -36,7 +46,7 @@ module.exports = {
     },
 
     "counter": {
-        description: "Return the winrates for the users pool versus given champ ",
+        description: "Provides winrates for the users champion pool versus <champ name> in <lane>",
         usage: `${prefix}counter <champ name> <lane>`,
         championless: false,
         args: 2,
@@ -44,10 +54,30 @@ module.exports = {
     },
     
     "op": {
-        description: "Logs the 3 strongest champions for given role",
+        description: "Lists and ranks all op.gg tier 1 champions for <lane>",
         usage: `${prefix}op <lane>`,
         championless: true,
         args: 1,
         process: pool.op
     },
+
+    "commands": {
+        description: "Lists all commands available to the 5P.GG bot",
+        usage: `${prefix}commands`,
+        championless: true,
+        args: 0,
+        process: (input) => {
+            const commandsArr = Object.keys(module.exports).map(command => {
+            const COMMAND_OBJ = module.exports[command]
+            const formatted = `**${COMMAND_OBJ.usage}** - ${COMMAND_OBJ.description}`
+            return formatted
+            });
+            
+            commandsArr.unshift('**5P.GG Command List**');
+
+            return commandsArr.join('\n')
+        
+        }
+    }
 };
+
