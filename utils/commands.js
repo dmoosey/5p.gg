@@ -59,15 +59,6 @@ module.exports = {
         process: pool.runes
     },
 
-    "info": {
-        description: "Provides a basic overview on the given champ",
-        usage: `${prefix}info <champ>`,
-        championless: false,
-        args: 1,
-        process: pool.info
-
-    },
-
     "commands": {
         description: "Lists all commands available to the 5P.GG bot",
         usage: `${prefix}commands`,
