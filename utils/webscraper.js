@@ -87,4 +87,4 @@ const getOP = async (lane) => {
     return op;
 }
 
-module.exports = {scrape, validate, getOP};
+module.exports = { scrape, validate, getOP };

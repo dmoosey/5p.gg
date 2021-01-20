@@ -19,14 +19,14 @@ client.on('ready', () => {
 client.on('message', async (msg) => {
     try {
         if(msg.author.username == '5P.GG') return
+
         const parsed = await parseCommand(msg);
+
         return msg.reply(await commands[parsed.command].process(parsed));
 
     } catch (err) {
         console.log(err);
     }
-
-
 })
 
 client.login(process.env.GGTOKEN);

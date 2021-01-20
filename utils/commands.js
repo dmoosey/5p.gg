@@ -51,6 +51,14 @@ module.exports = {
         process: pool.op
     },
 
+    "runes": {
+        description: "Logs a link to the given champions runes page",
+        usage: `${prefix}runes <champ> <lane>`,
+        championess: false,
+        args: 2,
+        process: pool.runes
+    },
+
     "info": {
         description: "Provides a basic overview on the given champ",
         usage: `${prefix}info <champ>`,

@@ -207,7 +207,11 @@ const op = async (input) => {
         console.log(err);
         return err.message
     }
-
 }
 
-module.exports = { addChamp, displayPool, deleteChamp, counter, op };
+const runes = (input) => {
+    const url = 'https://euw.op.gg/champion/' + input.champ.raw + '/statistics/' + input.lane.raw + '/rune';
+    return url
+}
+
+module.exports = { addChamp, displayPool, deleteChamp, counter, op, runes };
