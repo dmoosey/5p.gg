@@ -19,6 +19,7 @@ client.on('ready', () => {
 client.on('message', async (msg) => {
     try {
         if(msg.author.username == '5P.GG') return
+        if(!config.channels.includes(msg.channel.id)) return
 
         const parsed = await parseCommand(msg);
 
