@@ -4,7 +4,7 @@ const user = require('./user'),
 
 module.exports = {
     "start": {
-        description: "Initalizes a 5p.gg profile for the user",
+        description: "Initalizes a 5P.GG profile for the user",
         usage: `${prefix}start`,
         championless: true,
         args: 0,
@@ -49,6 +49,15 @@ module.exports = {
         championless: true,
         args: 1,
         process: pool.op
+    },
+
+    "info": {
+        description: "Provides a basic overview on the given champ",
+        usage: `${prefix}info <champ>`,
+        championless: false,
+        args: 1,
+        process: pool.info
+
     },
 
     "commands": {
