@@ -54,9 +54,17 @@ module.exports = {
     "runes": {
         description: "Logs a link to the given champions runes page",
         usage: `${prefix}runes <champ> <lane>`,
-        championess: false,
+        championless: false,
         args: 2,
         process: pool.runes
+    },
+
+    "bans": {
+        description: "Recommend good bans for the users champion pool",
+        usage: `${prefix}bans`,
+        championless: true,
+        args: 0,
+        process: pool.bans
     },
 
     "commands": {

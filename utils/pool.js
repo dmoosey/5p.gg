@@ -88,16 +88,16 @@ const displayPool = (input) => {
         if (champs.length <= 0) return "You haven't added any champs to your pool yet use **' >add <champ name> '** to get started."
 
         // Convert the champ names to sentence case
-        function format(str){
-            str = str.replace(/\b[a-z]/g, (letter) => letter.toUpperCase() );
-            str = str.replace(/'(S) /g, (letter) => letter.toLowerCase() );
+        function format(str) {
+            str = str.replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+            str = str.replace(/'(S) /g, (letter) => letter.toLowerCase());
             return `**${str}**`;
         }
 
         champs.forEach((champ, index, champs) => {
             let formatted = format(champ);
             // hard coded edge case
-            if(champ == 'jarvan iv') formatted = `**Jarvan IV**`;
+            if (champ == 'jarvan iv') formatted = `**Jarvan IV**`;
             champs[index] = formatted;
         });
 
@@ -163,7 +163,7 @@ const counter = async (input) => {
             champ = champ.replace(/\b\w/g, l => l.toUpperCase());
 
             //hard coded edge case
-            if(champ == 'Jarvan Iv') champ = `Jarvan IV`;
+            if (champ == 'Jarvan Iv') champ = `Jarvan IV`;
 
             statsArr.push(`**${champ}** | ${wr}% *(${sample} games)*`);
         }
@@ -214,4 +214,46 @@ const runes = (input) => {
     return url
 }
 
-module.exports = { addChamp, displayPool, deleteChamp, counter, op, runes };
+const bans = async (input) => {
+    try {
+        readDB();
+        const userPool = USER_OBJ[input.user.id]["pool"];
+        // scores will be an object containing ban scores for any champion that holds a <50% winrate versus a champ in the users pool
+        const scores = await webScraper.getBanScores(userPool);
+
+        //console.log(scores);
+
+        const totalScores = {}
+
+        for (const champ of Object.keys(scores)) {
+            const badMatchups = Object.keys(scores[champ]);
+
+            for (const matchup of badMatchups) {
+                if (!Object.keys(totalScores).includes(matchup)) {
+                    totalScores[matchup] = scores[champ][matchup];
+                } else {
+                    totalScores[matchup] += scores[champ][matchup];
+                }
+                console.log(`${matchup} score: ${totalScores[matchup]}`);
+            }
+        }
+
+        const getMax = object => {
+            return Object.keys(object).filter(x => {
+                 return object[x] == Math.max.apply(null, 
+                 Object.values(object));
+           });
+        };
+
+        const ban = (getMax(totalScores))[0];
+
+        return `Best ban: **${ban}** with a ban score of ${totalScores[ban]}.`
+
+    } catch (err) {
+        console.log(err);
+        return err.message
+    }
+
+}
+
+module.exports = { addChamp, displayPool, deleteChamp, counter, op, runes, bans };
