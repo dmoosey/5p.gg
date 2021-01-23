@@ -4,11 +4,35 @@ const fs = require('fs'),
 let DATABASE = JSON.parse(fs.readFileSync('./data/DATABASE.json')),
     USER_OBJ = DATABASE["users"];
 
-/*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*HELPERS-----------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+//Ensures program is referencing most current data
 const readDB = () => {
     DATABASE = JSON.parse(fs.readFileSync('./data/DATABASE.json'));
     USER_OBJ = DATABASE["users"];
+};
+
+//Returns champion names in sentence case
+const format = (str) => {
+    str = str.replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+    str = str.replace(/'(S) /g, (letter) => letter.toLowerCase());
+    return `**${str}**`;
+};
+
+
+const status = async () => {
+    const url = "https://op.gg/";
+    const html = await rp(url);
+    const query = "div:contains('Maintenance')";
+
+    const found = $(query, html);
+
+    if(found.length > 0 ) throw new Error('OP.GG is currently down. Data cannot be retrieved.');
 }
+/*-----------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+
+
+
 
 
 // Adds provided champion to the users pool object
@@ -88,11 +112,6 @@ const displayPool = (input) => {
         if (champs.length <= 0) return "You haven't added any champs to your pool yet use **' >add <champ name> '** to get started."
 
         // Convert the champ names to sentence case
-        function format(str) {
-            str = str.replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
-            str = str.replace(/'(S) /g, (letter) => letter.toLowerCase());
-            return `**${str}**`;
-        }
 
         champs.forEach((champ, index, champs) => {
             let formatted = format(champ);
@@ -246,10 +265,12 @@ const bans = async (input) => {
         };
 
         const ban = (getMax(totalScores))[0];
+        const ban_formatted = format(ban);
 
-        return `Best ban: **${ban}** with a ban score of ${totalScores[ban]}.`
+        return `Best ban: ${ban_formatted} with a ban score of ${totalScores[ban]}.`
 
     } catch (err) {
+        status();
         console.log(err);
         return err.message
     }

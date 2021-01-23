@@ -2,6 +2,7 @@ const rp = require('request-promise');
 const $ = require('cheerio');
 const fs = require('fs');
 
+
 // Write data to users pool and return an object containing matchup data for opponents choice vs your champ pool
 const scrape = async (pool, input) => {
     const matchup = input.champ.raw;
@@ -131,6 +132,8 @@ const getBanScores = async (pool) => {
     return scores
 }
 
+/* HELPERS */
+// Remove all non-character symbols from a string
 const cleanString = (str) => {
     return str.replace(/[|&;$%@"<>()+,]/g, "")
 }
