@@ -12,7 +12,7 @@ const addUser = async (input) => {
         const users = Object.keys(DATABASE.users);
 
         // If the user already has a profile return
-        if (users.some(e => e == userId)) return `${user} You already have a 5p.gg profile.`
+        if (users.some(id => id == userId)) return `${user} You already have a 5p.gg profile.`
 
         // Add new data, checking if user already has a profile
         if (!users.includes(userId)) {
@@ -23,7 +23,6 @@ const addUser = async (input) => {
             }
         };
 
-        console.log(DATABASE);
 
         // Convert back to JSON
         const updated = JSON.stringify(DATABASE);

@@ -90,11 +90,14 @@ const getOP = async (lane) => {
 
 const getBanScores = async (pool) => {
     const scores = {};
-    for (const champ of Object.keys(pool)) {
+    for (let champ of Object.keys(pool)) {
+
+        champ = cleanString(champ);
 
         scores[champ] = {};
 
-        let url = 'https://euw.op.gg/champion/' + champ;
+        let url = 'https://euw.op.gg/champion/' + cleanString(champ);
+
         const champ_main = await rp(url);
         const counters_tab = "a:contains('Counters')";
         const countersPath = $(counters_tab, champ_main)[0].attribs.href;
@@ -109,14 +112,16 @@ const getBanScores = async (pool) => {
 
         for (let i = 0; i < ((Object.keys(MATCHUP_DATA_ELEMENT).length) - 4); i++) {
 
-            
+
             const MATCHUP_OBJ = MATCHUP_DATA_ELEMENT[i].attribs;
             const PLAYED_OBJ = PLAYED_DATA_ELEMENT[i].children[0];
             
-            const matchup_name = MATCHUP_OBJ['data-champion-name'];
+            const matchup_name = cleanString(MATCHUP_OBJ['data-champion-name']);
+
+            if(Object.keys(pool).includes(matchup_name)) continue
+
             const user_win_rate = Math.abs(MATCHUP_OBJ['data-value-winrate'] * 100).toFixed(2);
-            const play_rate = Number(cleanString(PLAYED_OBJ.data));
-            
+            const play_rate = Number(cleanString(PLAYED_OBJ.data));      
 
             if (user_win_rate >= 50) continue
 
@@ -124,18 +129,25 @@ const getBanScores = async (pool) => {
 
             if (play_rate <= 1) continue
 
+
+            scores[champ][matchup_name] = {
+                winrate: user_win_rate,
+                pickrate: play_rate,
+            };
+
             const score = Math.round(((50 - user_win_rate) * play_rate) * 100);
 
-            scores[champ][matchup_name] = score;
+            scores[champ][matchup_name]["score"] = score;
         }
     }
+    console.log(scores);
     return scores
 }
 
 /* HELPERS */
 // Remove all non-character symbols from a string
 const cleanString = (str) => {
-    return str.replace(/[|&;$%@"<>()+,]/g, "")
+    return str.replace(/['|&;$%@"<>()+,]/g, "")
 }
 
 module.exports = { scrape, validate, getOP, getBanScores };

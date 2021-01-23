@@ -18,21 +18,7 @@ const format = (str) => {
     return `**${str}**`;
 };
 
-
-const status = async () => {
-    const url = "https://op.gg/";
-    const html = await rp(url);
-    const query = "div:contains('Maintenance')";
-
-    const found = $(query, html);
-
-    if(found.length > 0 ) throw new Error('OP.GG is currently down. Data cannot be retrieved.');
-}
 /*-----------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-
-
-
-
 
 
 // Adds provided champion to the users pool object
@@ -249,28 +235,35 @@ const bans = async (input) => {
 
             for (const matchup of badMatchups) {
                 if (!Object.keys(totalScores).includes(matchup)) {
-                    totalScores[matchup] = scores[champ][matchup];
+                    totalScores[matchup] = scores[champ][matchup].score;
                 } else {
-                    totalScores[matchup] += scores[champ][matchup];
+                    totalScores[matchup] += scores[champ][matchup].score;
                 }
-                console.log(`${matchup} score: ${totalScores[matchup]}`);
             }
         }
 
         const getMax = object => {
             return Object.keys(object).filter(x => {
-                 return object[x] == Math.max.apply(null, 
-                 Object.values(object));
-           });
+                return object[x] == Math.max.apply(null,
+                    Object.values(object));
+            });
         };
 
-        const ban = (getMax(totalScores))[0];
-        const ban_formatted = format(ban);
+        let formatted = [`**Best Bans** *for your pool*`];
 
-        return `Best ban: ${ban_formatted} with a ban score of ${totalScores[ban]}.`
+        for (let i = 0; i < 3; i++) {
+            const ban = (getMax(totalScores))[0];
+            const ban_formatted = format(ban);
+            const score = totalScores[ban];
+            const medal = i === 0 ? ':first_place:' : i === 1 ? ':second_place:' : ':third_place:';
+            const str =`${medal}${ban_formatted} | Ban Score: **${score}**`
+            formatted.push(str);
+            delete totalScores[ban];
+        }
+
+        return formatted.join('\n')
 
     } catch (err) {
-        status();
         console.log(err);
         return err.message
     }
