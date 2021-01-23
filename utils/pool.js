@@ -226,8 +226,8 @@ const bans = async (input) => {
         // scores will be an object containing ban scores for any champion that holds a <50% winrate versus a champ in the users pool
         const scores = await webScraper.getBanScores(userPool);
 
-        //console.log(scores);
-
+        console.log(scores);
+        
         const totalScores = {}
 
         for (const champ of Object.keys(scores)) {
@@ -255,6 +255,7 @@ const bans = async (input) => {
             const ban = (getMax(totalScores))[0];
             const ban_formatted = format(ban);
             const score = totalScores[ban];
+
             const medal = i === 0 ? ':first_place:' : i === 1 ? ':second_place:' : ':third_place:';
             const str =`${medal}${ban_formatted} | Ban Score: **${score}**`
             formatted.push(str);

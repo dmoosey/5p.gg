@@ -121,6 +121,7 @@ const getBanScores = async (pool) => {
             if(Object.keys(pool).includes(matchup_name)) continue
 
             const user_win_rate = Math.abs(MATCHUP_OBJ['data-value-winrate'] * 100).toFixed(2);
+            const games_played = MATCHUP_OBJ['data-value-totalplayed'];
             const play_rate = Number(cleanString(PLAYED_OBJ.data));      
 
             if (user_win_rate >= 50) continue
@@ -133,9 +134,14 @@ const getBanScores = async (pool) => {
             scores[champ][matchup_name] = {
                 winrate: user_win_rate,
                 pickrate: play_rate,
+                played: games_played
             };
 
-            const score = Math.round(((50 - user_win_rate) * play_rate) * 100);
+            /* Ban Value algorithm */
+            const score = Math.round(Math.log(1 - (played * (1 - (user_win_rate / 50)) / (user_win_rate - 50))) * 1000);
+
+            /* Old primitive algorithm */
+            //const score = Math.round(((50 - user_win_rate) * play_rate) * 100);
 
             scores[champ][matchup_name]["score"] = score;
         }
