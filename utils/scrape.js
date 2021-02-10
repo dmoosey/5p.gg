@@ -47,32 +47,6 @@ champ = (champ_input) => {
         champs[champ_name] = champ_data;
     })
 
-    /*
-    // Returning data for a single champion does not need a container object
-    if (typeof champ_input == 'string') {
-        return get_JSON_data(champ_input)
-    }
-
-    // Initialize container object
-    const champs = {}
-
-    // Determine wether input is a JSON object
-    
-
-    for (const champ_name of champ_input) {
-        try {
-            champ_data = get_JSON_data(champ_name)
-        } catch (err) {
-            throw err
-            continue
-        }
-        champs[champ_name] = champ_data;
-    }
-
-    // Un-nest champ object if only one is present in master object due to invalid names
-    champ_count = Object.keys(champs).length;
-    if (champ_count == 1) return champs[Object.keys(champs)[0]]
-    */
     return champs
 }
 
