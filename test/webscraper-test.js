@@ -1,5 +1,5 @@
 var assert = require('assert');
-var Scrape = require('../utils/webscraper2');
+var Scrape = require('../utils/scrape');
 
 describe('Scrape', () => {
     describe('#champ', () => {
