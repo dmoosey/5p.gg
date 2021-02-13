@@ -23,14 +23,38 @@ describe('Scrape', () => {
     })
     describe('#OPGG_data', () => {
         describe('#overview', () => {
-            it('returns an object containing data from champs op.gg overview page', () => {
+            it('resolves to an object containing data from champs op.gg overview page', () => {
                 const input = "Fizz";
                 const expected = {
                     roles : ["Middle"],
                     tier : "Tier 2" 
                 }
-                const result = Scrape.OPGG_data.overview(input)
-                assert.deepStrictEqual(result, expected);
+                // Asynchronous assertion pattern
+                return Scrape.OPGG_data.overview(input).then(result => {
+                    assert.deepStrictEqual(result, expected)
+                })
+            })
+            it('resolves to an object containing data from champs op.gg overview page (multiple roles)', () => {
+                const input = "Ekko";
+                const expected = {
+                    roles : ["Jungle", "Middle"],
+                    tier : "Tier 2" 
+                }
+                
+                return Scrape.OPGG_data.overview(input).then(result => {
+                    assert.deepStrictEqual(result, expected)
+                })
+            })
+            it('returns null values if desired data is not available', () => {
+                const input = "Amumu";
+                const expected = {
+                    roles : null,
+                    tier : null
+                }
+
+                return Scrape.OPGG_data.overview(input).then(result => {
+                    assert.deepStrictEqual(result, expected)
+                })
             })
         })
     })
@@ -82,10 +106,32 @@ describe('Scrape', () => {
             const expected = Scrape.champ(["Fizz", "Zoe"]);
             assert.deepStrictEqual(result, expected);
         })
-        it('raises an error if no valid champion names were given', () => {
-            const input = ["Jhizz", "Glizz", "Whizz"];
-            const result = () => {Scrape.champ(input)};
-            assert.throws(result, /No valid champion names provided/);
+    })
+    describe('#validate_input', () => {
+        it('returns false for invalid champion names', () => {
+            const expected = false;
+            const input = "Jhizz";
+            const result = Scrape.validate_input(input);
+            assert.equal(result, expected);
+        })
+        it('returns false for invalid champion objects', () => {
+            const expected = false;
+            const input = {
+                name: "Jhizz",
+                winrate : 50.0,
+                pickrate : 4.99
+            };
+            const result = Scrape.validate_input(input);
+            assert.equal(result, expected);
+        })
+        it('returns an error if object has no name property', () => {
+            const input = {
+                winrate : 50.0,
+                pickrate : 4.99
+            };
+            const expected = Error('No property "name" found on input.');
+            const result = Scrape.validate_input(input);
+            assert.deepEqual(result, expected);
         })
     })
 })
