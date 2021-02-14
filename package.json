@@ -4,7 +4,8 @@
   "description": "Discord Bot for 5p.gg counter pick assistant",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test" : "mocha",
+    "test-scrape": "mocha 'test/webscraper-test.js'"
   },
   "keywords": [
     "LoL",
