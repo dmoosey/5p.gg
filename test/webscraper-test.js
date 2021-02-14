@@ -18,43 +18,63 @@ describe('Scrape', () => {
         it('raises a type error when an invalid champion input is passed', () => {
             const input = 'Jhizz';
             const result = () => {Scrape.JSON_data(input)};
-            assert.throws(result, /Invalid Champion name/);
+            assert.throws(result, /Invalid champion name provided/);
         })
     })
     describe('#OPGG_data', () => {
         describe('#overview', () => {
-            it('resolves to an object containing data from champs op.gg overview page', () => {
-                const input = "Fizz";
-                const expected = {
+            it('resolves to an object containing data from champs op.gg overview page', async function(){
+                this.timeout(3000);
+                const input = Scrape.JSON_data("Fizz");
+                const expected = Object.assign(input, {
                     roles : ["Middle"],
-                    tier : "Tier 2" 
-                }
-                // Asynchronous assertion pattern
+                    tier : 'Tier 2'
+                });
+                // Asynchronous assertion pattern 1
                 return Scrape.OPGG_data.overview(input).then(result => {
                     assert.deepStrictEqual(result, expected)
                 })
             })
-            it('resolves to an object containing data from champs op.gg overview page (multiple roles)', () => {
-                const input = "Ekko";
-                const expected = {
+            it('resolves to an object containing data from champs op.gg overview page (multiple roles)', async function(){
+                this.timeout(3000);
+                const input = Scrape.JSON_data("Ekko")
+                const expected = Object.assign(input, {
                     roles : ["Jungle", "Middle"],
                     tier : "Tier 2" 
-                }
+                });
                 
                 return Scrape.OPGG_data.overview(input).then(result => {
                     assert.deepStrictEqual(result, expected)
                 })
             })
-            it('returns null values if desired data is not available', () => {
-                const input = "Amumu";
-                const expected = {
+            it('returns null values if desired data is not available', async function(){
+                this.timeout(3000);
+                const input = Scrape.JSON_data("Amumu")
+                const expected = Object.assign(input, {
                     roles : null,
                     tier : null
-                }
+                });
 
                 return Scrape.OPGG_data.overview(input).then(result => {
                     assert.deepStrictEqual(result, expected)
                 })
+            })
+        })
+        describe('#items',() => {
+            it('resolves to an object containing data from op.gg items page', async function (){
+                this.timeout(5000);
+                const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Fizz"));
+                console.log(input);
+                const expected = {
+                    middle : {
+                        core : ["Night Harvester", "Lich Bane", "Zhonya's Hourglass"],
+                        boots : "Ionian Boots of Lucidity",
+                        starter : ["Corrupting Potion"]
+                    }
+                }
+                // Asynchronous assertion pattern 2
+                const result = await Scrape.OPGG_data.items(input);
+                assert.deepStrictEqual(result, expected);
             })
         })
     })
