@@ -74,6 +74,7 @@ OPGG_data = {
     // champ_input is the object returned from OPGG_data()
     items: async (champ_input) => {
         const champ_name = champ_input.name;
+        const items = {};
         for (const role of champ_input.roles) {
             const role_key = OPGG_data.roles_web[role];
             const url = `https://euw.op.gg/champion/${champ_name}/statistics/${role_key}/item`;
@@ -84,47 +85,65 @@ OPGG_data = {
 
             const core_class = '.champion-stats__list';
 
-            const ul_tag = $(core_class, html);
-            console.log(ul_tag);
+            const core_best_ul = $(core_class, html);
+
+            const core_li_tags = core_best_ul[0].children.filter(e => {
+                return e.type == 'tag' && e.name == 'li'
+            })
+
+            for (const li of core_li_tags) {
+                const data = li.attribs.title;
+                if (data === undefined) continue
+                const item = $('b', data);
+                const item_name = item[0].children[0].data;
+                core.push(item_name);
+            }
+            const role_obj = {
+                boots: boots,
+                core: core,
+                starter: starter
+            }
+            items[role_key] = role_obj;
         }
+        return items
     }
 }
 
 champ = (champ_input) => {
-        // Identify JSON inputs
-        if (typeof champ_input == 'object' && !Array.isArray(champ_input)) {
-            champ_input = Object.keys(champ_input)
-        };
+    // Identify JSON inputs
+    if (typeof champ_input == 'object' && !Array.isArray(champ_input)) {
+        champ_input = Object.keys(champ_input)
+    };
 
-        // Identify queries for a single champ
-        if (typeof champ_input == 'string') {
-            champ_input = new Array(champ_input)
-        };
+    // Identify queries for a single champ
+    if (typeof champ_input == 'string') {
+        champ_input = new Array(champ_input)
+    };
 
-        // return Filtered Array with only valid names (ones that we have data for)
-        champ_input_filtered = champ_input.filter((v, i) => {
-            return validate_input(v)
-        });
+    // return Filtered Array with only valid names (ones that we have data for)
+    champ_input_filtered = champ_input.filter((v, i) => {
+        return validate_input(v)
+    });
 
-        // How many champs are we working with
-        champ_count = champ_input_filtered.length;
+    // How many champs are we working with
+    champ_count = champ_input_filtered.length;
 
-        // All champs were invalid and have been filtered out
-        if (champ_count == 0) throw new TypeError(`No valid champion names provided`)
+    // All champs were invalid and have been filtered out
+    if (champ_count == 0) throw new TypeError(`No valid champion names provided`)
 
-        // For single queries no container object is needed so just return the single object
-        if (champ_count == 1) return JSON_data(champ_input_filtered[0])
+    // For single queries no container object is needed so just return the single object
+    if (champ_count == 1) return JSON_data(champ_input_filtered[0])
 
-        // Container object
-        champs = {};
+    // Container object
+    champs = {};
 
-        // Iterate over our filtered array retreiving and writing our champ objects into their container
-        champ_input_filtered.forEach(champ_name => {
-            champ_data = JSON_data(champ_name);
-            champs[champ_name] = champ_data;
-        })
-        // return master object
-        return champs
-    }
+    // Iterate over our filtered array retreiving and writing our champ objects into their container
+    champ_input_filtered.forEach(champ_name => {
+        champ_data = JSON_data(champ_name);
+        champs[champ_name] = champ_data;
+    })
+    // return master object
+    return champs
+}
 
 module.exports = { champ, JSON_data, OPGG_data, validate_input }

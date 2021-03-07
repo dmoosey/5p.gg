@@ -66,8 +66,8 @@ describe('Scrape', () => {
                 const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Fizz"));
                 console.log(input);
                 const expected = {
-                    middle : {
-                        core : ["Night Harvester", "Lich Bane", "Zhonya's Hourglass"],
+                    mid : {
+                        core : ["Zhonya's Hourglass", "Luden's Tempest", "Lich Bane"],
                         boots : "Ionian Boots of Lucidity",
                         starter : ["Corrupting Potion"]
                     }
