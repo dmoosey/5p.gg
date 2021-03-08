@@ -126,7 +126,6 @@ OPGG_data = {
                 core: core,
                 starter: starter
             }
-            console.log(role_obj);
             items[role_key] = role_obj;
         }
         return items
