@@ -79,9 +79,12 @@ OPGG_data = {
             const role_key = OPGG_data.roles_web[role];
             const url = `https://euw.op.gg/champion/${champ_name}/statistics/${role_key}/item`;
             const html = await rp(url);
+
             let core = [];
             let boots = '';
             let starter = [];
+
+            /* CORE BUILD */
 
             const core_class = '.champion-stats__list';
 
@@ -98,11 +101,32 @@ OPGG_data = {
                 const item_name = item[0].children[0].data;
                 core.push(item_name);
             }
+
+            /* BOOTS */
+            const boots_class = '.champion-stats__single__item';
+            const boots_div = $(boots_class, html);
+
+            boots = boots_div[0].children[2].children[0].data;
+            
+            /* STARTER ITEMS */
+            const starter_box = $('.l-champion-statistics-content__main > .champion-box:last-child', html);
+            const best_starter = $('tbody > tr:first-child', starter_box);
+
+            const starter_li = $('.champion-stats__list__item', best_starter);
+            for(const li of starter_li){
+                const data = li.attribs.title;
+                if (data === undefined) continue
+                const item = $('b', data);
+                const item_name = item[0].children[0].data;
+                starter.push(item_name);
+            }
+
             const role_obj = {
                 boots: boots,
                 core: core,
                 starter: starter
             }
+            console.log(role_obj);
             items[role_key] = role_obj;
         }
         return items
