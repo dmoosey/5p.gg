@@ -61,10 +61,9 @@ describe('Scrape', () => {
             })
         })
         describe('#items',() => {
-            it('resolves to an object containing data from op.gg items page', async function (){
+            it('resolves to an object containing data from op.gg items page (1 role)', async function (){
                 this.timeout(5000);
                 const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Fizz"));
-                console.log(input);
                 const expected = {
                     mid : {
                         core : ["Zhonya's Hourglass", "Luden's Tempest", "Lich Bane"],
@@ -73,6 +72,24 @@ describe('Scrape', () => {
                     }
                 }
                 // Asynchronous assertion pattern 2
+                const result = await Scrape.OPGG_data.items(input);
+                assert.deepStrictEqual(result, expected);
+            })
+            it('resolves to an object containing data from op.gg items page (2 roles)', async function (){
+                this.timeout(5000);
+                const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Ekko"));
+                const expected = {
+                    jungle : {
+                        core : ["Hextech Rocketbelt", "Lich Bane", "Zhonya's Hourglass"],
+                        boots : "Sorcerer's Shoes",
+                        starter : ["Hailblade", "Refillable Potion"]
+                    },
+                    mid : {
+                        core : ["Hextech Rocketbelt", "Lich Bane", "Zhonya's Hourglass"],
+                        boots : "Sorcerer's Shoes",
+                        starter : ["Corrupting Potion"]
+                    }
+                }
                 const result = await Scrape.OPGG_data.items(input);
                 assert.deepStrictEqual(result, expected);
             })
