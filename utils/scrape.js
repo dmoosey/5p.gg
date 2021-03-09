@@ -142,7 +142,7 @@ OPGG_data = {
             const li_selector = 'li[data-tab-show-class="ChampionSkillPriorites-1"]';
             const li_tag = $(li_selector, html);
             const best_order = $('li > span', li_tag).text();
-            skill_order = best_order.split('');
+            Object.assign(skill_order, best_order);
         }
         return skill_order
     }
