@@ -129,6 +129,22 @@ OPGG_data = {
             items[role_key] = role_obj;
         }
         return items
+    },
+    skills : async(champ_input) => {
+        const champ_name = champ_input.name;
+        let skill_order = [];
+
+        for (const role of champ_input.roles) {
+            const role_key = OPGG_data.roles_web[role];
+            const url = `https://euw.op.gg/champion/${champ_name}/statistics/${role_key}/skill`;
+            const html = await rp(url);
+
+            const li_selector = 'li[data-tab-show-class="ChampionSkillPriorites-1"]';
+            const li_tag = $(li_selector, html);
+            const best_order = $('li > span', li_tag).text();
+            skill_order = best_order.split('');
+        }
+        return skill_order
     }
 }
 

@@ -94,6 +94,15 @@ describe('Scrape', () => {
                 assert.deepStrictEqual(result, expected);
             })
         })
+        describe('#skills', () => {
+            it('resolves to an array ordered for the champions best skill path', async function (){
+                this.timeout(5000);
+                const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Fizz"));
+                const expected = ['E', 'W', 'Q'];
+                const result = await Scrape.OPGG_data.skills(input);
+                assert.deepStrictEqual(result, expected);
+            })
+        })
     })
     describe('#champ', () => {
         it('returns a champion object containing data for the provided champion', () => {
