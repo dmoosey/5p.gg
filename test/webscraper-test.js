@@ -75,7 +75,7 @@ describe('Scrape', () => {
                 const result = await Scrape.OPGG_data.items(input);
                 assert.deepStrictEqual(result, expected);
             })
-            it('resolves to an object containing data from op.gg items page (2 roles)', async function () {
+            it('resolves to an object containing data from op.gg items page (multiple roles)', async function () {
                 this.timeout(5000);
                 const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Ekko"));
                 const expected = {
@@ -104,13 +104,33 @@ describe('Scrape', () => {
                 const result = await Scrape.OPGG_data.skills(input);
                 assert.deepStrictEqual(result, expected);
             })
+            it('resolves to an array ordered for the champions best skill path (multiple roles)', async function () {
+                this.timeout(5000);
+                const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Ekko"));
+                const expected = {
+                    jungle: ['Q', 'E', 'W'],
+                    mid : ['Q', 'E', 'W']
+                };
+                const result = await Scrape.OPGG_data.skills(input);
+                assert.deepStrictEqual(result, expected);
+            })
         })
         describe('#runes', () => {
-            it('returns a string containing the champs best rune setup', async function () {
+            it('returns an array containing the champs best rune setup', async function () {
                 this.timeout(5000);
                 const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Fizz"));
                 const expected = {
                     mid: ['Domination', 'Electrocute', 'Precision']
+                }
+                const result = await Scrape.OPGG_data.runes(input);
+                assert.deepStrictEqual(result, expected);
+            })
+            it('resolves to an object containing an array of rune data (multiple roles)', async function () {
+                this.timeout(5000);
+                const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Ekko"));
+                const expected = {
+                    jungle: ['Domination', 'Dark Harvest', 'Inspiration'],
+                    mid: ['Domination', 'Electrocute', 'Sorcery']
                 }
                 const result = await Scrape.OPGG_data.runes(input);
                 assert.deepStrictEqual(result, expected);
