@@ -6,53 +6,53 @@ describe('Scrape', () => {
         it('returns an object containing local (champs.json) data for the given champion', () => {
             const input = "Fizz"
             const expected = {
-                id : "Fizz",
-                name : "Fizz",
-                key : "105",
-                title : "the Tidal Trickster",
-                tags : ["Assassin","Fighter"]
+                id: "Fizz",
+                name: "Fizz",
+                key: "105",
+                title: "the Tidal Trickster",
+                tags: ["Assassin", "Fighter"]
             }
             const result = Scrape.JSON_data(input);
             assert.deepStrictEqual(result, expected);
         })
         it('raises a type error when an invalid champion input is passed', () => {
             const input = 'Jhizz';
-            const result = () => {Scrape.JSON_data(input)};
+            const result = () => { Scrape.JSON_data(input) };
             assert.throws(result, /Invalid champion name provided/);
         })
     })
     describe('#OPGG_data', () => {
         describe('#overview', () => {
-            it('resolves to an object containing data from champs op.gg overview page', async function(){
+            it('resolves to an object containing data from champs op.gg overview page', async function () {
                 this.timeout(3000);
                 const input = Scrape.JSON_data("Fizz");
                 const expected = Object.assign(input, {
-                    roles : ["Middle"],
-                    tier : 'Tier 2'
+                    roles: ["Middle"],
+                    tier: 'Tier 2'
                 });
                 // Asynchronous assertion pattern 1
                 return Scrape.OPGG_data.overview(input).then(result => {
                     assert.deepStrictEqual(result, expected)
                 })
             })
-            it('resolves to an object containing data from champs op.gg overview page (multiple roles)', async function(){
+            it('resolves to an object containing data from champs op.gg overview page (multiple roles)', async function () {
                 this.timeout(3000);
                 const input = Scrape.JSON_data("Ekko")
                 const expected = Object.assign(input, {
-                    roles : ["Jungle", "Middle"],
-                    tier : "Tier 2" 
+                    roles: ["Jungle", "Middle"],
+                    tier: "Tier 2"
                 });
-                
+
                 return Scrape.OPGG_data.overview(input).then(result => {
                     assert.deepStrictEqual(result, expected)
                 })
             })
-            it('returns null values if desired data is not available', async function(){
+            it('returns null values if desired data is not available', async function () {
                 this.timeout(3000);
                 const input = Scrape.JSON_data("Amumu")
                 const expected = Object.assign(input, {
-                    roles : null,
-                    tier : null
+                    roles: null,
+                    tier: null
                 });
 
                 return Scrape.OPGG_data.overview(input).then(result => {
@@ -60,34 +60,34 @@ describe('Scrape', () => {
                 })
             })
         })
-        describe('#items',() => {
-            it('resolves to an object containing data from op.gg items page (1 role)', async function (){
+        describe('#items', () => {
+            it('resolves to an object containing data from op.gg items page (1 role)', async function () {
                 this.timeout(5000);
                 const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Fizz"));
                 const expected = {
-                    mid : {
-                        core : ["Zhonya's Hourglass", "Luden's Tempest", "Lich Bane"],
-                        boots : "Ionian Boots of Lucidity",
-                        starter : ["Corrupting Potion"]
+                    mid: {
+                        core: ["Zhonya's Hourglass", "Luden's Tempest", "Lich Bane"],
+                        boots: "Ionian Boots of Lucidity",
+                        starter: ["Corrupting Potion"]
                     }
                 }
                 // Asynchronous assertion pattern 2
                 const result = await Scrape.OPGG_data.items(input);
                 assert.deepStrictEqual(result, expected);
             })
-            it('resolves to an object containing data from op.gg items page (2 roles)', async function (){
+            it('resolves to an object containing data from op.gg items page (2 roles)', async function () {
                 this.timeout(5000);
                 const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Ekko"));
                 const expected = {
-                    jungle : {
-                        core : ["Hextech Rocketbelt", "Lich Bane", "Zhonya's Hourglass"],
-                        boots : "Sorcerer's Shoes",
-                        starter : ["Hailblade", "Refillable Potion"]
+                    jungle: {
+                        core: ["Hextech Rocketbelt", "Lich Bane", "Zhonya's Hourglass"],
+                        boots: "Sorcerer's Shoes",
+                        starter: ["Hailblade", "Refillable Potion"]
                     },
-                    mid : {
-                        core : ["Hextech Rocketbelt", "Lich Bane", "Zhonya's Hourglass"],
-                        boots : "Sorcerer's Shoes",
-                        starter : ["Corrupting Potion"]
+                    mid: {
+                        core: ["Hextech Rocketbelt", "Lich Bane", "Zhonya's Hourglass"],
+                        boots: "Sorcerer's Shoes",
+                        starter: ["Corrupting Potion"]
                     }
                 }
                 const result = await Scrape.OPGG_data.items(input);
@@ -95,11 +95,24 @@ describe('Scrape', () => {
             })
         })
         describe('#skills', () => {
-            it('resolves to an array ordered for the champions best skill path', async function (){
+            it('resolves to an array ordered for the champions best skill path', async function () {
                 this.timeout(5000);
                 const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Fizz"));
-                const expected = ['E', 'W', 'Q'];
+                const expected = {
+                    mid: ['E', 'W', 'Q']
+                };
                 const result = await Scrape.OPGG_data.skills(input);
+                assert.deepStrictEqual(result, expected);
+            })
+        })
+        describe('#runes', () => {
+            it('returns a string containing the champs best rune setup', async function () {
+                this.timeout(5000);
+                const input = await Scrape.OPGG_data.overview(Scrape.JSON_data("Fizz"));
+                const expected = {
+                    mid: ['Domination', 'Electrocute', 'Precision']
+                }
+                const result = await Scrape.OPGG_data.runes(input);
                 assert.deepStrictEqual(result, expected);
             })
         })
@@ -115,8 +128,8 @@ describe('Scrape', () => {
         it('returns multiple nested objects when an array of champions is given', () => {
             const input = ["Fizz", "Zoe"];
             const expected = {
-                "Fizz" : Scrape.champ(input[0]),
-                "Zoe" : Scrape.champ(input[1])
+                "Fizz": Scrape.champ(input[0]),
+                "Zoe": Scrape.champ(input[1])
             }
             const result = Scrape.champ(input);
             assert.deepStrictEqual(result, expected);
@@ -141,13 +154,13 @@ describe('Scrape', () => {
             assert.strictEqual(result, expected);
         })
         it('filter out any invalid champion names in given JSON file', () => {
-            const input = {"Jhizz" : {}, "Fizz" : {}, "Glizz": {}};
+            const input = { "Jhizz": {}, "Fizz": {}, "Glizz": {} };
             const result = Scrape.champ(input);
             const expected = Scrape.champ("Fizz");
             assert.deepStrictEqual(result, expected);
         })
         it('filter out any invalid champion names in given JSON file (multiple valid)', () => {
-            const input = {"Jhizz" : {}, "Fizz" : {}, "Glizz": {}, "Zoe": {}};
+            const input = { "Jhizz": {}, "Fizz": {}, "Glizz": {}, "Zoe": {} };
             const result = Scrape.champ(input);
             const expected = Scrape.champ(["Fizz", "Zoe"]);
             assert.deepStrictEqual(result, expected);
@@ -164,16 +177,16 @@ describe('Scrape', () => {
             const expected = false;
             const input = {
                 name: "Jhizz",
-                winrate : 50.0,
-                pickrate : 4.99
+                winrate: 50.0,
+                pickrate: 4.99
             };
             const result = Scrape.validate_input(input);
             assert.equal(result, expected);
         })
         it('returns an error if object has no name property', () => {
             const input = {
-                winrate : 50.0,
-                pickrate : 4.99
+                winrate: 50.0,
+                pickrate: 4.99
             };
             const expected = Error('No property "name" found on input.');
             const result = Scrape.validate_input(input);

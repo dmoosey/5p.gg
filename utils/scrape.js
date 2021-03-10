@@ -1,5 +1,6 @@
 const rp = require('request-promise');
 const $ = require('cheerio');
+var Helpers = require('./helpers');
 
 const champion_data = require('../data/champs.json');
 
@@ -107,13 +108,13 @@ OPGG_data = {
             const boots_div = $(boots_class, html);
 
             boots = boots_div[0].children[2].children[0].data;
-            
+
             /* STARTER ITEMS */
             const starter_box = $('.l-champion-statistics-content__main > .champion-box:last-child', html);
             const best_starter = $('tbody > tr:first-child', starter_box);
 
             const starter_li = $('.champion-stats__list__item', best_starter);
-            for(const li of starter_li){
+            for (const li of starter_li) {
                 const data = li.attribs.title;
                 if (data === undefined) continue
                 const item = $('b', data);
@@ -130,21 +131,47 @@ OPGG_data = {
         }
         return items
     },
-    skills : async(champ_input) => {
+    skills: async (champ_input) => {
         const champ_name = champ_input.name;
-        let skill_order = [];
+        let skill_order = {};
 
         for (const role of champ_input.roles) {
             const role_key = OPGG_data.roles_web[role];
             const url = `https://euw.op.gg/champion/${champ_name}/statistics/${role_key}/skill`;
             const html = await rp(url);
 
+            const role_skills = [];
+
             const li_selector = 'li[data-tab-show-class="ChampionSkillPriorites-1"]';
             const li_tag = $(li_selector, html);
             const best_order = $('li > span', li_tag).text();
-            Object.assign(skill_order, best_order);
+            Object.assign(role_skills, best_order);
+
+            skill_order[role_key] = role_skills;
         }
         return skill_order
+    },
+    runes: async (champ_input) => {
+        const champ_name = champ_input.name;
+        let runes = {};
+
+        for (const role of champ_input.roles) {
+            const role_key = OPGG_data.roles_web[role];
+            const url = `https://euw.op.gg/champion/${champ_name}/statistics/${role_key}/rune`;
+            const html = await rp(url);
+
+            const role_runes = [];
+
+            const img_selector = 'li[data-tab-show-class="ChampionKeystoneRune-1"] > img';
+            const best_runes = $(img_selector, html);
+            for(let i = 0; i < best_runes.length; i++){
+                role_runes.push(Helpers.imgurl_to_string(best_runes[i].attribs.src))
+            }
+
+            runes[role_key] = role_runes;
+        }
+
+        return runes
     }
 }
 
