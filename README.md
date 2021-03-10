@@ -1,9 +1,9 @@
 # 5p.gg
 
-## LoL Counter Pick Assitant Discord Bot
-Due to the lack of an [OP.GG](op.gg) API, this bot uses the `request-promise` library to fetch html from op.gg's champion matchup pages which is then parsed using `cheerio`.
+## LoL Statistics Discord Bot
+Due to the lack of an [OP.GG](op.gg) API, this bot uses the [`request-promise`](https://www.npmjs.com/package/request-promise) library to fetch html from op.gg which is then parsed and dissected using [`cheerio`](https://www.npmjs.com/package/cheerio).
 
-5p.gg will log the winrates (with sample sizes) against the enemy pick for all champions in your pool in descending order. If there is no data on the matchup the values will log as ```null```.
+Users can firect the bot to fetch different pieces of data according the series of programmed commands.
 ## Current Features
 
 ### Commands 
