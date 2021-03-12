@@ -169,6 +169,29 @@ describe('Scrape', () => {
                 assert.deepStrictEqual(result, expected);
             })
         })
+        describe.only('#counters', () => {
+            it('returns stats for common matchups', async function() {
+                this.timeout(5000);
+                const input = await Scrape.OPGG_data.overview(Scrape.JSON_data('Fizz'));
+                const expected = {
+                    mid : {}
+                };
+                const expected_length = 50;
+                const result = await Scrape.OPGG_data.counters(input);
+                assert.deepEqual(Object.keys(result), Object.keys(expected));
+                assert.equal(Object.keys(result.mid).length, expected_length);
+            })
+            it('returns stats for common matchups in each role', async function() {
+                this.timeout(5000);
+                const input = await Scrape.OPGG_data.overview(Scrape.JSON_data('Ekko'));
+                const expected = {
+                    jungle: {},
+                    mid : {}
+                };
+                const result = await Scrape.OPGG_data.counters(input);
+                assert.deepEqual(Object.keys(result), Object.keys(expected));
+            })
+        })
     })
     describe('#champ', () => {
         it('returns a champion object containing data for the provided champion', () => {

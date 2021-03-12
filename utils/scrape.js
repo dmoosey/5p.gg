@@ -196,6 +196,33 @@ OPGG_data = {
             trend_data[role_key] = role_trends;
         }
         return trend_data
+    },
+    counters : async (champ_input) => {
+        const champ_name = champ_input.name;
+        let counter_data = {};
+
+        for (const role of champ_input.roles) {
+            const role_key = OPGG_data.roles_web[role];
+            const url = `https://euw.op.gg/champion/${champ_name}/statistics/${role_key}/matchup`;
+            const html = await rp(url);
+
+            counter_data[role_key] = {};
+
+            const div_selector = '.champion-matchup-champion-list__item';
+            const counter_divs = $(div_selector, html);
+
+            for(const matchup of counter_divs){
+                const data = matchup.attribs;
+                const champ_key = data['data-champion-key'];
+                counter_data[role_key][champ_key] = {
+                    id : parseInt(data['data-champion-id']),
+                    name : data['data-champion-name'],
+                    winrate : parseFloat((parseFloat(data['data-value-winrate']) * 100).toFixed(2)), //ugly
+                    totalplayed : parseInt(data['data-value-totalplayed'])
+                }
+            } 
+        }
+        return counter_data
     }
 }
 
