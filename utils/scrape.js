@@ -172,6 +172,30 @@ OPGG_data = {
         }
 
         return runes
+    },
+    trends : async (champ_input) => {
+        const champ_name = champ_input.name;
+        let trend_data = {};
+
+        for (const role of champ_input.roles) {
+            const role_key = OPGG_data.roles_web[role];
+            const url = `https://euw.op.gg/champion/${champ_name}/statistics/${role_key}/trend`;
+            const html = await rp(url);
+
+            const role_trends = {};
+            const data_order = ['winrate', 'pickrate', 'banrate'];
+
+            const div_selector = '.champion-stats-trend-rate';
+            const trend_div = $(div_selector, html);
+
+            for(let i = 0; i < data_order.length; i++) {
+                const data = trend_div[i].children[0].data;
+                const to_float = parseFloat(data);
+                role_trends[data_order[i]] = to_float;
+            }
+            trend_data[role_key] = role_trends;
+        }
+        return trend_data
     }
 }
 

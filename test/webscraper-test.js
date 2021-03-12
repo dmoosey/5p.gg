@@ -136,6 +136,39 @@ describe('Scrape', () => {
                 assert.deepStrictEqual(result, expected);
             })
         })
+        describe('#trends', () => {
+            it('resolves to an object containing champion trend data', async function (){
+                this.timeout(5000);
+                const input = await Scrape.OPGG_data.overview(Scrape.JSON_data('Fizz'));
+                const expected = {
+                    mid : {
+                        winrate : 50.47,
+                        pickrate : 5.97,
+                        banrate : 16.54
+                    }
+                };
+                const result = await Scrape.OPGG_data.trends(input);
+                assert.deepStrictEqual(result, expected);
+            })
+            it('seperates role data into their own objects', async function (){
+                this.timeout(5000);
+                const input = await Scrape.OPGG_data.overview(Scrape.JSON_data('Ekko'));
+                const expected = {
+                    jungle: {
+                        winrate: 48.5,
+                        pickrate: 5.1,
+                        banrate: 2.97
+                    },
+                    mid : {
+                        winrate : 51.9,
+                        pickrate : 4.2,
+                        banrate : 2.97
+                    }
+                };
+                const result = await Scrape.OPGG_data.trends(input);
+                assert.deepStrictEqual(result, expected);
+            })
+        })
     })
     describe('#champ', () => {
         it('returns a champion object containing data for the provided champion', () => {
