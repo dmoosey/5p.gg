@@ -169,7 +169,7 @@ describe('Scrape', () => {
                 assert.deepStrictEqual(result, expected);
             })
         })
-        describe.only('#counters', () => {
+        describe('#counters', () => {
             it('returns stats for common matchups', async function() {
                 this.timeout(5000);
                 const input = await Scrape.OPGG_data.overview(Scrape.JSON_data('Fizz'));
