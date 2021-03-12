@@ -17,7 +17,7 @@ const update_champs_json = (language="en_GB") => {
                         if (err) {
                             throw err;
                         }
-                        console.log("JSON champ data is saved.");
+                        console.log(`champs.json (${language}) updated for ${current_ver}`);
                     });
                 })
         })
@@ -41,7 +41,7 @@ const update_items_json = (language="en_GB") => {
                         if (err) {
                             throw err;
                         }
-                        console.log("JSON item data is saved.");
+                        console.log(`items.json (${language}) updated for ${current_ver}`);
                     });
                 })
         })
@@ -59,14 +59,13 @@ const update_runes_json = (language="en_GB") => {
             axios.get(`http://ddragon.leagueoflegends.com/cdn/${current_ver}/data/${language}/runesReforged.json`)
                 .then(response => {
                     const rune_data = response.data;
-                    console.log(rune_data);
                     const to_JSON = JSON.stringify(rune_data);
 
                     fs.writeFile('./data/runes.json', to_JSON, (err) => {
                         if (err) {
                             throw err;
                         }
-                        console.log("JSON rune data is saved.");
+                        console.log(`runes.json (${language}) updated for ${current_ver}`);
                     });
                 })
         })
