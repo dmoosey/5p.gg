@@ -40,7 +40,7 @@ OPGG_data = {
     // champ_input is the object returned from JSON_data(champ_name)
     overview: async (champ_input) => {
         const champ_name = champ_input.name;
-        if (!validate_input(champ_name)) throw new Error("Invalid champion name provided.")
+        //if (!validate_input(champ_name)) throw new Error("Invalid champion name provided.")
         // fetch champ overview page
         const url = `https://euw.op.gg/champion/${champ_name}/statistics/`;
         const html = await rp(url);
@@ -226,41 +226,25 @@ OPGG_data = {
     }
 }
 
-champ = (champ_input) => {
-    // Identify JSON inputs
-    if (typeof champ_input == 'object' && !Array.isArray(champ_input)) {
-        champ_input = Object.keys(champ_input)
-    };
-
-    // Identify queries for a single champ
-    if (typeof champ_input == 'string') {
-        champ_input = new Array(champ_input)
-    };
-
-    // return Filtered Array with only valid names (ones that we have data for)
-    champ_input_filtered = champ_input.filter((v, i) => {
-        return validate_input(v)
-    });
-
-    // How many champs are we working with
-    champ_count = champ_input_filtered.length;
-
-    // All champs were invalid and have been filtered out
-    if (champ_count == 0) throw new TypeError(`No valid champion names provided`)
-
-    // For single queries no container object is needed so just return the single object
-    if (champ_count == 1) return JSON_data(champ_input_filtered[0])
-
-    // Container object
-    champs = {};
-
-    // Iterate over our filtered array retreiving and writing our champ objects into their container
-    champ_input_filtered.forEach(champ_name => {
-        champ_data = JSON_data(champ_name);
-        champs[champ_name] = champ_data;
-    })
-    // return master object
-    return champs
+champ = async (champ_name) => {
+    const champ_json = JSON_data(champ_name);
+    const champ_overview = await OPGG_data.overview(champ_json);
+    const results = await Promise.allSettled([
+        OPGG_data.items(champ_overview), 
+        OPGG_data.skills(champ_overview), 
+        OPGG_data.runes(champ_overview), 
+        OPGG_data.trends(champ_overview),
+        OPGG_data.counters(champ_overview)
+    ]);
+    
+    return {
+        overview: champ_overview,
+        items: results[0].value,
+        skills : results[1].value,
+        runes : results[2].value,
+        trends: results[3].value,
+        counters: results[4].value
+    }
 }
 
 module.exports = { champ, JSON_data, OPGG_data, validate_input }

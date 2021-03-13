@@ -193,53 +193,13 @@ describe('Scrape', () => {
             })
         })
     })
-    describe('#champ', () => {
-        it('returns a champion object containing data for the provided champion', () => {
+    describe.only('#champ', () => {
+        it('returns a merged object of all webscraped data', async function(){
+            this.timeout(5000);
             const input = "Fizz";
-            const expected = true;
-            const result = Scrape.champ(input);
-            const compare = typeof result && (Object.keys(result).length > 0);
-            assert.strictEqual(compare, expected);
-        })
-        it('returns multiple nested objects when an array of champions is given', () => {
-            const input = ["Fizz", "Zoe"];
-            const expected = {
-                "Fizz": Scrape.champ(input[0]),
-                "Zoe": Scrape.champ(input[1])
-            }
-            const result = Scrape.champ(input);
-            assert.deepStrictEqual(result, expected);
-        })
-        it('filter out any invalid champion names in provided array', () => {
-            const input = ["Jhizz", "Fizz", "Glizz"]
-            const result = Scrape.champ(input);
-            const expected = Scrape.champ("Fizz");
-            assert.deepStrictEqual(result, expected);
-        })
-        it('filter out any invalid champion names in provided array (multiple valid)', () => {
-            const input = ["Jhizz", "Fizz", "Glizz", "Zoe"];
-            const result = Scrape.champ(input);
-            const expected = Scrape.champ(["Fizz", "Zoe"]);
-            assert.deepStrictEqual(result, expected);
-        })
-        it('returns an object for every champion in a given JSON file', () => {
-            // Expected amount of keys in master object
-            const expected = 154;
-            const input = require('../data/champs.json');
-            const result = Object.keys(Scrape.champ(input)).length;
-            assert.strictEqual(result, expected);
-        })
-        it('filter out any invalid champion names in given JSON file', () => {
-            const input = { "Jhizz": {}, "Fizz": {}, "Glizz": {} };
-            const result = Scrape.champ(input);
-            const expected = Scrape.champ("Fizz");
-            assert.deepStrictEqual(result, expected);
-        })
-        it('filter out any invalid champion names in given JSON file (multiple valid)', () => {
-            const input = { "Jhizz": {}, "Fizz": {}, "Glizz": {}, "Zoe": {} };
-            const result = Scrape.champ(input);
-            const expected = Scrape.champ(["Fizz", "Zoe"]);
-            assert.deepStrictEqual(result, expected);
+            const expected_keys = ['overview', 'items', 'skills', 'runes', 'trends', 'counters'];
+            const result = await Scrape.champ('Fizz');
+            assert.deepEqual(Object.keys(result), expected_keys);
         })
     })
     describe('#validate_input', () => {
