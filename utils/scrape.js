@@ -35,7 +35,7 @@ JSON_data = (champ_name) => {
 }
 
 OPGG_data = {
-    roles_web: { "Middle": "mid", "Bottom": "bot", "Support": "support", "Jungle": "jungle", "Bottom": "bot" },
+    roles_web: { "Middle": "mid", "Bottom": "bot", "Support": "support", "Jungle": "jungle", "Top": "top" },
     // Returns general information from op.gg for specified champion#
     // champ_input is the object returned from JSON_data(champ_name)
     overview: async (champ_input) => {
@@ -67,7 +67,6 @@ OPGG_data = {
         }
         let overview = { roles, tier };
         let champ_general = Object.assign(champ_input, overview);
-
         return champ_general
 
     },
