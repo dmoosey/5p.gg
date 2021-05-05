@@ -2,31 +2,9 @@ const Scrape = require('./scrape');
 const mongoose = require('mongoose');
 const champ_data = Object.keys(require('../data/champs.json'));
 const cliProgress = require('cli-progress');
+const Champ = require('../data/Champ');
 
 mongoose.set('useFindAndModify', false);
-
-const Schema = mongoose.Schema;
-
-// rework schema with JSON -> schema mapping tool
-const champ_schema = new Schema({
-    _id: String,
-    overview: {
-        id: String,
-        name: String,
-        key: String,
-        title: String,
-        tags: [String],
-        roles: [String],
-        tier: String
-    },
-    items: Schema.Types.Mixed,
-    skills: Schema.Types.Mixed,
-    runes: Schema.Types.Mixed,
-    trends: Schema.Types.Mixed,
-    counters: Schema.Types.Mixed,
-});
-
-const Champ = mongoose.model('Champ', champ_schema, 'champs');
 
 const mongo_uri = "mongodb+srv://dmoore:Nkv1Tp0EnrYdChnf@5pgg.xwr1h.mongodb.net/Champion?retryWrites=true&w=majority";
 
