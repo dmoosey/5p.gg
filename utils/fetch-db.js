@@ -1,11 +1,10 @@
-const mongoose = require('mongoose');
+const Champ = require('../data/Champ');
+const db = require('./db');
 
-const mongo_uri = "mongodb+srv://dmoore:Nkv1Tp0EnrYdChnf@5pgg.xwr1h.mongodb.net/Champion?retryWrites=true&w=majority";
+c = 'Fizz';
 
-// Connect to the MongoDB cluster
-mongoose.connect(
-    mongo_uri, { useNewUrlParser: true, useUnifiedTopology: true }, () =>
-    console.log(" Mongoose is connected")
-);
+db.on('error', console.error.bind(console, 'connection error:'));
 
-const db = mongoose.connection;
+db.once('open', async function () {
+    console.log(await Champ.findById(c))
+});
