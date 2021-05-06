@@ -1,6 +1,7 @@
 const user = require('./user'),
     pool = require('./pool'),
     prefix = require('../data/config.json').prefix;
+    db = require('./fetch-db');
 
 module.exports = {
     "start": {
@@ -56,7 +57,7 @@ module.exports = {
         usage: `${prefix}runes <champ> <lane>`,
         championless: false,
         args: 2,
-        process: pool.runes
+        process: db.fetch_runes
     },
 
     "bans": {
