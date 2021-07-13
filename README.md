@@ -1,4 +1,5 @@
 # 5p.gg
+# Project is deprecated, working on a new version with the updated discord API.
 
 ## LoL Statistics Discord Bot
 Due to the lack of an [OP.GG](op.gg) API, this bot uses the [`request-promise`](https://www.npmjs.com/package/request-promise) library to fetch html from op.gg which is then parsed and dissected using [`cheerio`](https://www.npmjs.com/package/cheerio).
